@@ -3,16 +3,22 @@
     "browser": true,
     "es6": true
   },
-  "extends": ["react-app", "prettier"],
+  "extends": [
+    "react-app",
+    "prettier"
+  ],
   "parserOptions": {
     "ecmaVersion": 2018
   },
-  "plugins": ["react", "prettier"],
+  "plugins": [
+    "react",
+    "prettier"
+  ],
   "rules": {
     "prettier/prettier": [
       "error",
       {
-        "printWidth": 80,
+        "printWidth": 100,
         "trailingComma": "es5",
         "semi": true,
         "jsxSingleQuote": true,
