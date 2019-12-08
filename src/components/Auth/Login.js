@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import firebase from '../../firebase';
-
 import { Grid, Form, Segment, Button, Header, Message, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import styled from 'styled-components/macro';
+
+const LoginGrid = styled(Grid)`
+	height: 100vh;
+	background: #eee;
+`;
 
 class Login extends Component {
 	constructor(props) {
@@ -49,7 +54,7 @@ class Login extends Component {
 	render() {
 		const { email, password, error, loading } = this.state;
 		return (
-			<Grid textAlign='center' verticalAlign='middle'>
+			<LoginGrid textAlign='center' verticalAlign='middle'>
 				<Grid.Column style={{ maxWidth: 450 }}>
 					<Header as='h1' icon color='red' textAlign='center'>
 						<Icon name='linux' color='red' />
@@ -62,7 +67,7 @@ class Login extends Component {
 						</Message>
 					)}
 					<Form onSubmit={this.handleSubmit} size='large'>
-						<Segment stacked>
+						<Segment raised>
 							<Form.Input
 								fluid
 								name='email'
@@ -100,7 +105,7 @@ class Login extends Component {
 						</Message>
 					</Form>
 				</Grid.Column>
-			</Grid>
+			</LoginGrid>
 		);
 	}
 }

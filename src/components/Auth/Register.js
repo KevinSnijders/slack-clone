@@ -3,6 +3,12 @@ import firebase from '../../firebase';
 import md5 from 'md5';
 import { Grid, Form, Segment, Button, Header, Message, Icon } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import styled from 'styled-components/macro';
+
+const RegisterGrid = styled(Grid)`
+	height: 100vh;
+	background: #eee;
+`;
 
 class Register extends Component {
 	constructor(props) {
@@ -94,10 +100,10 @@ class Register extends Component {
 	render() {
 		const { username, email, password, passwordConfirmation, error, loading } = this.state;
 		return (
-			<Grid textAlign='center' verticalAlign='middle'>
+			<RegisterGrid textAlign='center' verticalAlign='middle'>
 				<Grid.Column style={{ maxWidth: 450 }}>
 					<Header as='h1' icon color='red' textAlign='center'>
-						<Icon name='compass outline' color='red' />
+						<Icon name='linux' color='red' />
 						Register for DevChat
 					</Header>
 					{error.length > 0 && (
@@ -107,7 +113,7 @@ class Register extends Component {
 						</Message>
 					)}
 					<Form onSubmit={this.handleSubmit} size='large'>
-						<Segment stacked>
+						<Segment raised>
 							<Form.Input
 								fluid
 								name='username'
@@ -166,7 +172,7 @@ class Register extends Component {
 						</Message>
 					</Form>
 				</Grid.Column>
-			</Grid>
+			</RegisterGrid>
 		);
 	}
 }
