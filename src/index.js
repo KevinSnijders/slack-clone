@@ -3,13 +3,16 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import Spinner from './components/Loading/Spinner';
 import * as serviceWorker from './serviceWorker';
+
+import firebase from './firebase';
+
 import { ThemeProvider } from 'styled-components/macro';
 import { GlobalStyle } from './theme/global';
 import { light } from './theme/theme';
 import 'semantic-ui-css/semantic.min.css';
 
-import firebase from './firebase';
 import { BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-dom';
 
 import { createStore } from 'redux';
@@ -36,7 +39,10 @@ class Root extends Component {
 	}
 
 	render() {
-		return (
+		console.log(this.props.isLoading);
+		return this.props.isLoading ? (
+			<Spinner />
+		) : (
 			<ThemeProvider theme={this.setCurrentTheme(light)}>
 				<GlobalStyle />
 				<Switch>
@@ -48,7 +54,12 @@ class Root extends Component {
 		);
 	}
 }
-const RootWithAuth = withRouter(connect(null, { setUser, setTheme })(Root));
+
+const mapStateToProps = state => ({
+	isLoading: state.user.isLoading,
+});
+
+const RootWithAuth = withRouter(connect(mapStateToProps, { setUser, setTheme })(Root));
 
 ReactDOM.render(
 	<Provider store={store}>
