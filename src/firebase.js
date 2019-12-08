@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/database';
 import 'firebase/storage';
 
-var firebaseConfig = {
+const firebaseConfig = {
 	apiKey: 'AIzaSyBemKkQZEFMNzSnRJRKXGVy5FldGAul2fk',
 	authDomain: 'slack-44daf.firebaseapp.com',
 	databaseURL: 'https://slack-44daf.firebaseio.com',
