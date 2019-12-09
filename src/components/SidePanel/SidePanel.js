@@ -9,7 +9,7 @@ class SidePanel extends Component {
 		return (
 			<Menu size='large' inverted fixed='left' vertical style={{ background: '#3F0E40' }}>
 				<UserPanel currentUser={currentUser} />
-				<Channels />
+				<Channels currentUser={currentUser} />
 			</Menu>
 		);
 	}
