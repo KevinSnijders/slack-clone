@@ -15,6 +15,15 @@ export const clearUser = () => {
 	};
 };
 
+export const setCurrentChannel = channel => {
+	return {
+		type: actionTypes.SET_CURRENT_CHANNEL,
+		payload: {
+			currentChannel: channel,
+		},
+	};
+};
+
 export const setTheme = theme => {
 	return {
 		type: actionTypes.SET_THEME,

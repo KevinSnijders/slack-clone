@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import firebase from '../../firebase';
+import { connect } from 'react-redux';
+import { setCurrentChannel } from '../../actions/index';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
 import styled from 'styled-components';
 
@@ -13,6 +15,7 @@ class Channels extends Component {
 
 		this.state = {
 			user: this.props.currentUser,
+			activeChannel: '',
 			channels: [],
 			channelsRef: firebase.database().ref('channels'),
 			channel: {
@@ -22,6 +25,7 @@ class Channels extends Component {
 			showModal: false,
 			canSubmit: false,
 			error: '',
+			firstLoad: true,
 		};
 	}
 
@@ -29,13 +33,22 @@ class Channels extends Component {
 		this.addListeners();
 	}
 
+	componentWillUnmount() {
+		this.removeListeners();
+	}
+
 	addListeners = () => {
 		let loadedChannels = [];
 		const { channelsRef } = this.state;
 		channelsRef.on('child_added', snap => {
 			loadedChannels.push(snap.val());
-			this.setState({ channels: loadedChannels });
+			this.setState({ channels: loadedChannels }, () => this.setFirstChannel());
 		});
+	};
+
+	removeListeners = () => {
+		const { channelsRef } = this.state;
+		channelsRef.off();
 	};
 
 	openModal = () => this.setState({ showModal: true });
@@ -69,6 +82,25 @@ class Channels extends Component {
 				console.log('channel created');
 			})
 			.catch(error => console.error(error));
+	};
+
+	setFirstChannel = () => {
+		const { firstLoad, channels } = this.state;
+		if (firstLoad && channels.length > 0) {
+			const firstChannel = channels[0];
+			this.props.setCurrentChannel(firstChannel);
+			this.setActiveChannel(firstChannel);
+		}
+		this.setState({ firstLoad: false });
+	};
+
+	setActiveChannel = channel => {
+		this.setState({ activeChannel: channel.id });
+	};
+
+	changeChannel = channel => {
+		this.setActiveChannel(channel);
+		this.props.setCurrentChannel(channel);
 	};
 
 	handleChange = event => {
@@ -118,7 +150,13 @@ class Channels extends Component {
 	displayChannels = channels =>
 		channels.length > 0 &&
 		channels.map(channel => (
-			<MenuItem key={channel.id} name={channel.name} style={{ opacity: 0.7 }}>
+			<MenuItem
+				key={channel.id}
+				onClick={() => this.changeChannel(channel)}
+				name={channel.name}
+				style={{ opacity: 0.7 }}
+				active={channel.id === this.state.activeChannel}
+			>
 				# {channel.name}
 			</MenuItem>
 		));
@@ -178,4 +216,4 @@ class Channels extends Component {
 	}
 }
 
-export default Channels;
+export default connect(null, { setCurrentChannel })(Channels);
