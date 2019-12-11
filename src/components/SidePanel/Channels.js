@@ -3,12 +3,20 @@ import firebase from '../../firebase';
 import { connect } from 'react-redux';
 import { setCurrentChannel } from '../../actions/index';
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react';
+import { Formik, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import styled from 'styled-components';
 
 const MenuItem = styled(Menu.Item)`
 	padding: 0 !important;
 `;
 
+const validationSchema = Yup.object().shape({
+	name: Yup.string()
+		.max(80, "Channel names can't be longer than 80 characters")
+		.required('Don’t forget to name your channel'),
+	description: Yup.string().max(250, "This field can't be more than 250 characters"),
+});
 class Channels extends Component {
 	constructor(props) {
 		super(props);
@@ -23,8 +31,6 @@ class Channels extends Component {
 				description: '',
 			},
 			showModal: false,
-			canSubmit: false,
-			error: '',
 			firstLoad: true,
 		};
 	}
@@ -55,10 +61,8 @@ class Channels extends Component {
 
 	closeModal = () => this.setState({ showModal: false, error: '' });
 
-	addChannel = () => {
-		console.log('add channel');
+	addChannel = ({ name, description }) => {
 		const { user, channelsRef } = this.state;
-		const { name, description = '' } = this.state.channel;
 		const key = channelsRef.push().key;
 
 		const newChannel = {
@@ -77,11 +81,15 @@ class Channels extends Component {
 			.child(key)
 			.update(newChannel)
 			.then(() => {
-				this.setState({ channel: { name: '', description: '' } });
 				this.closeModal();
 				console.log('channel created');
 			})
 			.catch(error => console.error(error));
+	};
+
+	changeChannel = channel => {
+		this.setActiveChannel(channel);
+		this.props.setCurrentChannel(channel);
 	};
 
 	setFirstChannel = () => {
@@ -98,17 +106,6 @@ class Channels extends Component {
 		this.setState({ activeChannel: channel.id });
 	};
 
-	changeChannel = channel => {
-		this.setActiveChannel(channel);
-		this.props.setCurrentChannel(channel);
-	};
-
-	handleChange = event => {
-		this.setState({ channel: { [event.target.name]: event.target.value } }, () => {
-			this.validateInputField(this.state.channel);
-		});
-	};
-
 	handleKeyDown = event => {
 		// No spaces are allowed in the channel name
 		const spaceKey = 32;
@@ -116,35 +113,6 @@ class Channels extends Component {
 			event.preventDefault();
 			return false;
 		}
-	};
-
-	handleSumbit = event => {
-		event.preventDefault();
-		if (this.state.canSubmit) {
-			this.addChannel();
-		}
-	};
-
-	validateInputField = ({ name, description }) => {
-		//TODO fix validation for fields instead of a field
-		if (name) {
-			this.setState({ canSubmit: true, error: '' });
-		} else {
-			this.setState({ canSubmit: false });
-			this.handleChannelNameErrors(name);
-		}
-	};
-
-	handleChannelNameErrors = name => {
-		if (name !== undefined && name.length === 0) {
-			this.handleInputError('Don’t forget to name your channel');
-		}
-	};
-
-	handleInputError = message => {
-		this.setState({
-			error: message,
-		});
 	};
 
 	displayChannels = channels =>
@@ -162,7 +130,7 @@ class Channels extends Component {
 		));
 
 	render() {
-		const { channels, showModal, canSubmit, error } = this.state;
+		const { channels, channel, showModal } = this.state;
 		return (
 			<>
 				<Menu.Menu style={{ paddingBottom: '2rem' }}>
@@ -181,35 +149,70 @@ class Channels extends Component {
 							Channels are where your team communicates. They’re best when organized around a topic
 							— #marketing, for example.
 						</p>
-						<Form>
-							<Form.Field>
-								<label>
-									<strong>Name</strong> {!canSubmit ? <span>{error}</span> : ''}
-								</label>
-								<Input
-									iconPosition='left'
-									placeholder='e.g. plan-budget'
-									name='name'
-									onChange={this.handleChange}
-									onKeyDown={this.handleKeyDown}
-								>
-									<Icon name='hashtag' />
-									<input />
-								</Input>
-							</Form.Field>
-							<Form.Field>
-								<label>
-									<strong>Description</strong> <span>(optional)</span>
-								</label>
-								<Input name='description' onChange={this.handleChange} />
-							</Form.Field>
-						</Form>
+						<Formik
+							initialValues={channel}
+							validationSchema={validationSchema}
+							onSubmit={(values, { setSubmitting, resetForm }) => {
+								setSubmitting(true);
+								this.addChannel(values);
+								resetForm();
+								setSubmitting(false);
+							}}
+						>
+							{({
+								values,
+								errors,
+								touched,
+								handleChange,
+								handleBlur,
+								handleSubmit,
+								isValid,
+								isSubmitting,
+							}) => (
+								<Form onSubmit={handleSubmit}>
+									<Form.Field>
+										<label>
+											<strong>Name</strong> &nbsp;
+											<ErrorMessage name='name' />
+										</label>
+										<Input
+											iconPosition='left'
+											placeholder='e.g. plan-budget'
+											name='name'
+											onChange={handleChange}
+											onBlur={handleBlur}
+											value={values.name}
+											onKeyDown={this.handleKeyDown}
+										>
+											<Icon name='hashtag' />
+											<input />
+										</Input>
+									</Form.Field>
+									<Form.Field>
+										<label>
+											<strong>Description</strong> <span>(optional)</span> &nbsp;
+											<ErrorMessage name='description' />
+										</label>
+										<Input
+											name='description'
+											onChange={handleChange}
+											onBlur={handleBlur}
+											value={values.description}
+											className={touched.description && errors.description ? 'error' : null}
+										/>
+									</Form.Field>
+									<Button
+										disabled={
+											isValid && Object.entries(touched).length !== 0 ? false : true || isSubmitting
+										}
+									>
+										Create
+									</Button>
+								</Form>
+							)}
+						</Formik>
 					</Modal.Content>
-					<Modal.Actions>
-						<Button disabled={!canSubmit} onClick={this.handleSumbit}>
-							Create
-						</Button>
-					</Modal.Actions>
+					<Modal.Actions></Modal.Actions>
 				</Modal>
 			</>
 		);
