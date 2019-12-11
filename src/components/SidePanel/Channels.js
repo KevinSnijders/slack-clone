@@ -202,9 +202,7 @@ class Channels extends Component {
 										/>
 									</Form.Field>
 									<Button
-										disabled={
-											isValid && Object.entries(touched).length !== 0 ? false : true || isSubmitting
-										}
+										disabled={isValid && values.name.length > 0 ? false : true || isSubmitting}
 									>
 										Create
 									</Button>
