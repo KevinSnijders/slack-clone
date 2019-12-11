@@ -81,6 +81,7 @@ class Channels extends Component {
 			.child(key)
 			.update(newChannel)
 			.then(() => {
+				this.changeChannel(newChannel);
 				this.closeModal();
 				console.log('channel created');
 			})
