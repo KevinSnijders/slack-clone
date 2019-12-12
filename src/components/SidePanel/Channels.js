@@ -202,11 +202,7 @@ class Channels extends Component {
 											className={touched.description && errors.description ? 'error' : null}
 										/>
 									</Form.Field>
-									<Button
-										disabled={isValid && values.name.length > 0 ? false : true || isSubmitting}
-									>
-										Create
-									</Button>
+									<Button>Create</Button>
 								</Form>
 							)}
 						</Formik>
