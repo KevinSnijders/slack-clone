@@ -19,6 +19,7 @@ class Messages extends Component {
 			messagesRef: Firebase.database().ref('messages'),
 			channel: this.props.currentChannel,
 			user: this.props.currentUser,
+			totalUniqueUsers: '',
 			messages: [],
 			searchTerm: '',
 			searchResults: [],
@@ -77,6 +78,20 @@ class Messages extends Component {
 		this.setState({ searchResults });
 	};
 
+	countUniqueUsers = messages => {
+		const uniqueUsers = messages.reduce((acc, message) => {
+			if (!acc.includes(message.user.name)) {
+				acc.push(message.user.name);
+			}
+			return acc;
+		}, []);
+		const plural = `${uniqueUsers.length > 1 ? 's' : ''}`;
+		const totalUniqueUsers = `${uniqueUsers.length} user${plural}`;
+		this.setState({
+			totalUniqueUsers,
+		});
+	};
+
 	displayMessages = messages =>
 		messages.length > 0 &&
 		messages.map(message => (
@@ -84,10 +99,22 @@ class Messages extends Component {
 		));
 
 	render() {
-		const { messagesRef, user, channel, messages, searchTerm, searchResults } = this.state;
+		const {
+			messagesRef,
+			user,
+			channel,
+			messages,
+			searchTerm,
+			searchResults,
+			totalUniqueUsers,
+		} = this.state;
 		return (
 			<>
-				<MessagesHeader handleSearchChange={this.handleSearchChange} channel={channel} />
+				<MessagesHeader
+					handleSearchChange={this.handleSearchChange}
+					channel={channel}
+					totalUniqueUsers={totalUniqueUsers}
+				/>
 
 				<Segment>
 					<MessagesWrapper>
