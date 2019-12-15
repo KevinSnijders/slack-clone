@@ -20,7 +20,8 @@ class Messages extends Component {
 			channel: this.props.currentChannel,
 			user: this.props.currentUser,
 			messages: [],
-			messagesLoading: true,
+			searchTerm: '',
+			searchResults: [],
 		};
 	}
 
@@ -45,14 +46,35 @@ class Messages extends Component {
 			loadedMessages.push(snap.val());
 			this.setState({
 				messages: loadedMessages,
-				messagesLoading: false,
 			});
+			this.countUniqueUsers(loadedMessages);
 		});
 	};
 
 	removeListeners = () => {
 		const { messagesRef } = this.state;
 		messagesRef.off();
+	};
+
+	handleSearchChange = event => {
+		this.setState(
+			{
+				searchTerm: event.target.value,
+			},
+			() => this.handleSearchMessages()
+		);
+	};
+
+	handleSearchMessages = () => {
+		const channelMessages = [...this.state.messages];
+		const regex = new RegExp(this.state.searchTerm, 'gi');
+		const searchResults = channelMessages.reduce((acc, message) => {
+			if ((message.content && message.content.match(regex)) || message.user.name.match(regex)) {
+				acc.push(message);
+			}
+			return acc;
+		}, []);
+		this.setState({ searchResults });
 	};
 
 	displayMessages = messages =>
@@ -62,13 +84,15 @@ class Messages extends Component {
 		));
 
 	render() {
-		const { messagesRef, user, channel, messages } = this.state;
+		const { messagesRef, user, channel, messages, searchTerm, searchResults } = this.state;
 		return (
 			<>
-				<MessagesHeader channel={channel} />
+				<MessagesHeader handleSearchChange={this.handleSearchChange} channel={channel} />
 
 				<Segment>
-					<MessagesWrapper>{this.displayMessages(messages)}</MessagesWrapper>
+					<MessagesWrapper>
+						{searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages)}
+					</MessagesWrapper>
 				</Segment>
 
 				<MessageForm messagesRef={messagesRef} user={user} channel={channel} />
