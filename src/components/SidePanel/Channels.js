@@ -23,7 +23,6 @@ class Channels extends Component {
 
 		this.state = {
 			user: this.props.currentUser,
-			activeChannel: '',
 			channels: [],
 			channelsRef: firebase.database().ref('channels'),
 			channel: {
@@ -89,7 +88,6 @@ class Channels extends Component {
 	};
 
 	changeChannel = channel => {
-		this.setActiveChannel(channel);
 		this.props.setCurrentChannel(channel);
 	};
 
@@ -98,13 +96,8 @@ class Channels extends Component {
 		if (firstLoad && channels.length > 0) {
 			const firstChannel = channels[0];
 			this.props.setCurrentChannel(firstChannel);
-			this.setActiveChannel(firstChannel);
 		}
 		this.setState({ firstLoad: false });
-	};
-
-	setActiveChannel = channel => {
-		this.setState({ activeChannel: channel.id });
 	};
 
 	handleKeyDown = event => {
@@ -124,7 +117,7 @@ class Channels extends Component {
 				onClick={() => this.changeChannel(channel)}
 				name={channel.name}
 				style={{ opacity: 0.7 }}
-				active={channel.id === this.state.activeChannel}
+				active={channel.id === this.props.activeChannel}
 			>
 				# {channel.name}
 			</MenuItem>
