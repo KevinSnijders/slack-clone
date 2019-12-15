@@ -7,7 +7,11 @@ import { connect } from 'react-redux';
 const App = ({ currentUser, currentChannel }) => {
 	return (
 		<Grid columns='equal' className='app' style={{ background: '#eee' }}>
-			<SidePanel key={currentUser && currentUser.uid} currentUser={currentUser} />
+			<SidePanel
+				key={currentUser && currentUser.uid}
+				currentUser={currentUser}
+				activeChannel={currentChannel && currentChannel.id}
+			/>
 			<Grid.Column style={{ marginLeft: '19rem' }}>
 				<Messages
 					key={currentChannel && currentChannel.id}

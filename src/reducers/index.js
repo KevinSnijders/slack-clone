@@ -26,6 +26,7 @@ const user_reducer = (state = initUserState, action) => {
 
 const initChannelState = {
 	currentChannel: null,
+	isPrivateChannel: false,
 };
 
 const channel_reducer = (state = initChannelState, action) => {
@@ -35,7 +36,11 @@ const channel_reducer = (state = initChannelState, action) => {
 				...state,
 				currentChannel: action.payload.currentChannel,
 			};
-
+		case actionTypes.SET_PRIVATE_CHANNEL:
+			return {
+				...state,
+				isPrivateChannel: action.payload.isPrivateChannel,
+			};
 		default:
 			return state;
 	}
